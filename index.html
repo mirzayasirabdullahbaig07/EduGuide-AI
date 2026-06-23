@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduGuide AI — Your Personal Learning Path Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f17;
+      --surface: #161924;
+      --surface-2: #1e2235;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.16);
+      --text: #f0f2ff;
+      --text-muted: #8a90a8;
+      --text-dim: #555a72;
+      --accent: #6c8fff;
+      --accent-2: #a78bfa;
+      --accent-glow: rgba(108, 143, 255, 0.15);
+      --green: #34d399;
+      --amber: #fbbf24;
+      --coral: #f87171;
+      --teal: #22d3ee;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(13,15,23,0.9);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+    }
+    .logo span { color: var(--accent); }
+    .nav-badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 5rem 2rem 3rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--accent);
+      border: 1px solid rgba(108,143,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    h1 em { color: var(--accent-2); font-style: italic; }
+    .hero-sub {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 540px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    /* ── STEP WIZARD ── */
+    .wizard-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+    .step-pills {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .pill {
+      font-size: 12px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      background: var(--surface);
+      transition: all 0.2s;
+    }
+    .pill.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+    .pill.done { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.08); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+    .card h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .card p.hint {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* form fields */
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.02em; }
+    input, textarea, select {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.7rem 1rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface-2); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* choice grid */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .choice-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      font-size: 0.88rem;
+      text-align: left;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .choice-btn:hover { border-color: var(--border-hover); color: var(--text); }
+    .choice-btn.selected { border-color: var(--accent); color: var(--text); background: var(--accent-glow); }
+    .choice-btn .icon { font-size: 1.2rem; flex-shrink: 0; }
+
+    /* buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.75rem 1.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #7d9fff; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+
+    /* ── LOADING ── */
+    .loading-card {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-steps { margin-top: 1.5rem; }
+    .loading-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      transition: color 0.4s;
+    }
+    .loading-step.active { color: var(--text-muted); }
+    .loading-step.done { color: var(--green); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+    /* ── ROADMAP RESULT ── */
+    #result-section { display: none; }
+
+    .result-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .result-header h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      margin-bottom: 0.3rem;
+    }
+    .result-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 0.8rem;
+    }
+    .meta-tag {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .week-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .week-card:hover { border-color: var(--border-hover); }
+    .week-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 1.1rem 1.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .week-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      border: 1px solid rgba(108,143,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    .week-title { flex: 1; font-weight: 500; font-size: 0.95rem; }
+    .week-chevron {
+      color: var(--text-dim);
+      transition: transform 0.25s;
+      font-size: 0.8rem;
+    }
+    .week-card.open .week-chevron { transform: rotate(180deg); }
+    .week-body {
+      display: none;
+      padding: 0 1.5rem 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .week-card.open .week-body { display: block; }
+    .week-focus {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 1rem 0 1rem;
+    }
+
+    .topic-list { list-style: none; margin-bottom: 1rem; }
+    .topic-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      padding: 4px 0;
+    }
+    .topic-list li::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .resources-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .resource-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .resource-chip {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .resource-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+    .milestone-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 0.75rem;
+      font-size: 12px;
+      color: var(--amber);
+      border: 1px solid rgba(251,191,36,0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      background: rgba(251,191,36,0.06);
+    }
+
+    /* progress tracker */
+    .progress-bar-wrap {
+      background: var(--surface-2);
+      border-radius: 4px;
+      height: 4px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    .complete-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      margin-top: 1rem;
+      user-select: none;
+    }
+    .complete-toggle input { width: auto; accent-color: var(--green); }
+
+    /* chat section */
+    .chat-section {
+      margin-top: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .chat-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chat-live-dot {
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+    }
+    .chat-messages {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 80px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+    .msg {
+      max-width: 90%;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: var(--accent-glow);
+      border: 1px solid rgba(108,143,255,0.2);
+      border-radius: 12px 12px 3px 12px;
+      padding: 0.65rem 1rem;
+      color: var(--text);
+    }
+    .msg.agent {
+      align-self: flex-start;
+      color: var(--text-muted);
+    }
+    .msg.agent strong { color: var(--text); }
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .chat-input {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.9rem;
+      padding: 0.6rem 1rem;
+    }
+    .chat-send {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .chat-send:hover { background: #7d9fff; }
+    .chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .choice-grid { grid-template-columns: 1fr; }
+      nav { padding: 1rem 1.2rem; }
+      .hero { padding: 3rem 1.2rem 2rem; }
+      .wizard-wrap { padding: 0 1rem 3rem; }
+      .card { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Edu<span>Guide</span> AI</div>
+    <div class="nav-badge">Agents for Good</div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-tag">AI-powered learning agent</div>
+    <h1>Your personal<br /><em>learning roadmap,</em><br />built in seconds</h1>
+    <p class="hero-sub">Tell us your goal and where you're starting from. The agent builds a step-by-step, week-by-week plan with free resources — tailored just for you.</p>
+  </div>
+
+  <div class="wizard-wrap">
+    <!-- Step indicators -->
+    <div class="step-pills">
+      <div class="pill active" id="pill-1">1 · Your goal</div>
+      <div class="pill" id="pill-2">2 · Your level</div>
+      <div class="pill" id="pill-3">3 · Preferences</div>
+      <div class="pill" id="pill-4">4 · Roadmap</div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="card" id="step-1">
+      <h2>What do you want to learn?</h2>
+      <p class="hint">Be as specific as possible — the agent tailors better with detail.</p>
+
+      <div class="field">
+        <label>Your learning goal</label>
+        <input type="text" id="goal-input" placeholder="e.g. Become a web developer, Learn machine learning, Pass IELTS..." />
+      </div>
+
+      <div class="field">
+        <label>Pick a category (optional)</label>
+        <div class="choice-grid" id="cat-grid">
+          <button class="choice-btn" data-val="Technology &amp; Programming"><span class="icon">💻</span>Tech &amp; Programming</button>
+          <button class="choice-btn" data-val="Data Science &amp; AI"><span class="icon">🤖</span>Data Science &amp; AI</button>
+          <button class="choice-btn" data-val="Language Learning"><span class="icon">🌐</span>Language Learning</button>
+          <button class="choice-btn" data-val="Business &amp; Finance"><span class="icon">📈</span>Business &amp; Finance</button>
+          <button class="choice-btn" data-val="Design &amp; Creative"><span class="icon">🎨</span>Design &amp; Creative</button>
+          <button class="choice-btn" data-val="Science &amp; Engineering"><span class="icon">🔬</span>Science &amp; Engineering</button>
+          <button class="choice-btn" data-val="Health &amp; Medicine"><span class="icon">🩺</span>Health &amp; Medicine</button>
+          <button class="choice-btn" data-val="Other"><span class="icon">✨</span>Other / Freestyle</button>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="step1-next">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 (hidden) -->
+    <div class="card" id="step-2" style="display:none">
+      <h2>What's your current level?</h2>
+      <p class="hint">Honest answers give you a more useful plan.</p>
+
+      <div class="field">
+        <label>Experience level</label>
+        <div class="choice-grid" id="level-grid">
+          <button class="choice-btn" data-val="Complete beginner — no background at all"><span class="icon">🌱</span>Complete beginner</button>
+          <button class="choice-btn" data-val="Some basics — I've tried a little but need structure"><span class="icon">📚</span>Some basics</button>
+          <button class="choice-btn" data-val="Intermediate — I know the fundamentals, want to go deeper"><span class="icon">🚀</span>Intermediate</button>
+          <button class="choice-btn" data-val="Advanced — looking to specialise or fill gaps"><span class="icon">🎯</span>Advanced</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>How much time can you give per week?</label>
+        <select id="hours-select">
+          <option value="2–3 hours per week">2–3 hours / week (light)</option>
+          <option value="5–7 hours per week" selected>5–7 hours / week (moderate)</option>
+          <option value="10–15 hours per week">10–15 hours / week (intensive)</option>
+          <option value="20+ hours per week">20+ hours / week (full-time learner)</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="step2-back">← Back</button>
+        <button class="btn btn-primary" id="step2-next">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 (hidden) -->
+    <div class="card" id="step-3" style="display:none">
+      <h2>A few preferences</h2>
+      <p class="hint">Helps the agent find the right resources and style for you.</p>
+
+      <div class="field">
+        <label>What's your target outcome?</label>
+        <select id="outcome-select">
+          <option value="Get a job or change careers">Get a job / career change</option>
+          <option value="Build a personal project or startup idea">Build a project / startup idea</option>
+          <option value="Pass an exam or certification">Pass an exam / certification</option>
+          <option value="General skill building for personal growth">Personal growth / curiosity</option>
+          <option value="Academic study support">Academic study support</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Preferred resource types</label>
+        <div class="choice-grid" id="res-grid">
+          <button class="choice-btn selected" data-val="YouTube videos"><span class="icon">▶️</span>YouTube videos</button>
+          <button class="choice-btn selected" data-val="Free online courses (Coursera, edX, Khan Academy)"><span class="icon">🎓</span>Free courses</button>
+          <button class="choice-btn" data-val="Books and reading"><span class="icon">📖</span>Books</button>
+          <button class="choice-btn" data-val="Practice projects and coding challenges"><span class="icon">🔨</span>Projects &amp; challenges</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Anything specific you want the plan to include? (optional)</label>
+        <textarea id="extra-input" placeholder="e.g. I want to avoid paid tools, focus on Python, prepare for interviews..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="step3-back">← Back</button>
+        <button class="btn btn-primary" id="generate-btn">Generate my roadmap ✦</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 LOADING (hidden) -->
+    <div class="card loading-card" id="step-loading" style="display:none">
+      <div class="spinner"></div>
+      <p style="font-weight:500; font-size:1rem;">Building your learning roadmap…</p>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-top:0.4rem;">The agent is structuring your personalised plan</p>
+      <div class="loading-steps">
+        <div class="loading-step" id="ls-1"><div class="dot"></div>Analysing your goal and level</div>
+        <div class="loading-step" id="ls-2"><div class="dot"></div>Structuring weekly milestones</div>
+        <div class="loading-step" id="ls-3"><div class="dot"></div>Sourcing free learning resources</div>
+        <div class="loading-step" id="ls-4"><div class="dot"></div>Finalising your roadmap</div>
+      </div>
+    </div>
+
+    <!-- STEP 4 RESULT (hidden) -->
+    <div id="result-section">
+      <div class="result-header">
+        <div style="color:var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">Your Personalised Roadmap</div>
+        <h2 id="roadmap-title">—</h2>
+        <p id="roadmap-summary" style="color:var(--text-muted); font-size:0.9rem; margin-top:6px;"></p>
+        <div class="result-meta" id="result-meta"></div>
+        <div class="progress-bar-wrap" style="margin-top:1rem;">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div style="font-size:12px; color:var(--text-dim);" id="progress-label">0 of 0 weeks completed</div>
+      </div>
+
+      <div id="weeks-container"></div>
+
+      <!-- Chat agent -->
+      <div class="chat-section">
+        <div class="chat-header">
+          <div class="chat-live-dot"></div>
+          Ask your learning agent anything
+        </div>
+        <div class="chat-messages" id="chat-msgs">
+          <div class="msg agent">Hi! I've built your roadmap. Ask me anything — <strong>how to stay motivated, what to do if you're stuck on a topic, how to adapt the plan,</strong> or anything else about your learning journey.</div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="Ask about your roadmap or learning journey…" />
+          <button class="chat-send" id="chat-send">Send</button>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:2rem;">
+        <button class="btn btn-ghost" id="restart-btn">← Start a new roadmap</button>
+      </div>
+    </div>
+
+  </div><!-- /wizard-wrap -->
+
+  <footer>
+    EduGuide AI · Built for Kaggle AI Agents Capstone · Agents for Good track<br/>
+    Powered by Claude AI · Free to use · No login required
+  </footer>
+
+<script>
+// ──────────────────────────────────────────
+// State
+// ──────────────────────────────────────────
+const state = {
+  goal: '', category: '', level: '', hours: '', outcome: '',
+  resources: ['YouTube videos', 'Free online courses (Coursera, edX, Khan Academy)'],
+  extra: '',
+  roadmap: null,
+  completedWeeks: new Set(),
+  chatHistory: []
+};
+
+// ──────────────────────────────────────────
+// Utility
+// ──────────────────────────────────────────
+function show(id) { document.getElementById(id).style.display = ''; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function showBlock(id) { document.getElementById(id).style.display = 'block'; }
+
+function setPill(step) {
+  [1,2,3,4].forEach(i => {
+    const p = document.getElementById('pill-'+i);
+    if (p) p.className = 'pill' + (i < step ? ' done' : i === step ? ' active' : '');
+  });
+}
+
+
+// Choice grid selection (single)
+function initSingleGrid(gridId, stateKey) {
+  document.getElementById(gridId).addEventListener('click', e => {
+    const btn = e.target.closest('.choice-btn');
+    if (!btn) return;
+    document.querySelectorAll(`#${gridId} .choice-btn`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state[stateKey] = btn.dataset.val;
+  });
+}
+
+// Choice grid multi-select
+function initMultiGrid(gridId, stateKey) {
+  document.getElementById(gridId).querySelectorAll('.choice-btn').forEach(btn => {
+    if (btn.classList.contains('selected')) {
+      if (!state[stateKey].includes(btn.dataset.val)) state[stateKey].push(btn.dataset.val);
+    }
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('selected');
+      const v = btn.dataset.val;
+      const idx = state[stateKey].indexOf(v);
+      if (idx > -1) state[stateKey].splice(idx, 1);
+      else state[stateKey].push(v);
+    });
+  });
+}
+
+initSingleGrid('cat-grid', 'category');
+initSingleGrid('level-grid', 'level');
+initMultiGrid('res-grid', 'resources');
+
+// ──────────────────────────────────────────
+// Navigation
+// ──────────────────────────────────────────
+document.getElementById('step1-next').addEventListener('click', () => {
+  state.goal = document.getElementById('goal-input').value.trim();
+  if (!state.goal) { document.getElementById('goal-input').focus(); return; }
+  hide('step-1'); showBlock('step-2'); setPill(2);
+});
+
+document.getElementById('step2-back').addEventListener('click', () => {
+  hide('step-2'); showBlock('step-1'); setPill(1);
+});
+document.getElementById('step2-next').addEventListener('click', () => {
+  if (!state.level) { alert('Please pick your experience level.'); return; }
+  state.hours = document.getElementById('hours-select').value;
+  hide('step-2'); showBlock('step-3'); setPill(3);
+});
+
+document.getElementById('step3-back').addEventListener('click', () => {
+  hide('step-3'); showBlock('step-2'); setPill(2);
+});
+document.getElementById('generate-btn').addEventListener('click', () => {
+  state.outcome = document.getElementById('outcome-select').value;
+  state.extra = document.getElementById('extra-input').value.trim();
+  generateRoadmap();
+});
+
+document.getElementById('restart-btn').addEventListener('click', () => {
+  location.reload();
+});
+
+// ──────────────────────────────────────────
+// Loading animation
+// ──────────────────────────────────────────
+function animateLoading() {
+  const steps = ['ls-1','ls-2','ls-3','ls-4'];
+  let i = 0;
+  function tick() {
+    if (i > 0) document.getElementById(steps[i-1]).classList.replace('active','done');
+    if (i < steps.length) {
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+      setTimeout(tick, 900);
+    }
+  }
+  tick();
+}
+
+// ──────────────────────────────────────────
+// Groq API call (free, fast)
+// ──────────────────────────────────────────
+const GROQ_API_KEY = 'gsk_YOUR_GROQ_API_KEY_HERE'; // <-- paste your free Groq key
+
+async function callGroq(systemPrompt, messages) {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + GROQ_API_KEY
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: 4096,
+      temperature: 0.7,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages
+      ]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `Groq API error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+// ──────────────────────────────────────────
+// Generate Roadmap
+// ──────────────────────────────────────────
+async function generateRoadmap() {
+  hide('step-3');
+  showBlock('step-loading');
+  setPill(4);
+  animateLoading();
+
+  const systemPrompt = `You are EduGuide AI, an expert education agent. You create structured, practical, week-by-week learning roadmaps.
+
+RESPOND ONLY WITH VALID JSON — no markdown fences, no preamble, no explanation outside the JSON.
+
+JSON structure:
+{
+  "title": "short roadmap title (e.g. Python for Data Science in 8 weeks)",
+  "summary": "2-sentence overview of the plan",
+  "duration": "e.g. 8 weeks",
+  "level": "beginner / intermediate / advanced",
+  "weeklyTime": "e.g. 5-7 hours/week",
+  "weeks": [
+    {
+      "week": 1,
+      "title": "Getting started: ...",
+      "focus": "1-2 sentence description of this week's theme",
+      "topics": ["topic 1", "topic 2", "topic 3"],
+      "resources": [
+        {"name": "Resource name", "url": "https://...", "type": "video/course/article/book"},
+        {"name": "Resource name", "url": "https://...", "type": "video/course/article/book"}
+      ],
+      "milestone": "What the learner can do / has built by end of this week"
+    }
+  ]
+}
+
+Guidelines:
+- Create 4–12 weeks depending on the goal complexity and time available
+- Topics per week: 3–5 bullet points
+- Resources: 2–3 per week, all FREE (YouTube, Khan Academy, freeCodeCamp, Coursera audit, MDN, MIT OCW, etc.)
+- Milestones should be concrete and motivating
+- Match difficulty to the stated level
+- Use real, working URLs where possible`;
+
+  const userMsg = `Build a learning roadmap for:
+Goal: ${state.goal}
+Category: ${state.category || 'General'}
+Level: ${state.level}
+Time available: ${state.hours}
+Target outcome: ${state.outcome}
+Preferred resources: ${state.resources.join(', ')}
+Extra notes: ${state.extra || 'None'}`;
+
+  try {
+    const raw = await callGroq(systemPrompt, [{ role: 'user', content: userMsg }]);
+    let cleaned = raw.trim().replace(/^```json\s*/,'').replace(/```\s*$/,'');
+    const roadmap = JSON.parse(cleaned);
+    state.roadmap = roadmap;
+    state.chatHistory = [{ role: 'user', content: userMsg }, { role: 'assistant', content: raw }];
+    hide('step-loading');
+    renderRoadmap(roadmap);
+  } catch(err) {
+    hide('step-loading');
+    showBlock('step-3');
+    setPill(3);
+    alert('Something went wrong generating your roadmap.\n\nError: ' + err.message + '\n\nCheck your API key and try again.');
+  }
+}
+
+// ──────────────────────────────────────────
+// Render Roadmap
+// ──────────────────────────────────────────
+function renderRoadmap(r) {
+  document.getElementById('roadmap-title').textContent = r.title;
+  document.getElementById('roadmap-summary').textContent = r.summary;
+
+  const meta = document.getElementById('result-meta');
+  meta.innerHTML = [
+    r.duration, r.level, r.weeklyTime
+  ].filter(Boolean).map(t => `<span class="meta-tag">${t}</span>`).join('');
+
+  const container = document.getElementById('weeks-container');
+  container.innerHTML = '';
+
+  (r.weeks || []).forEach((w, i) => {
+    const card = document.createElement('div');
+    card.className = 'week-card';
+    card.innerHTML = `
+      <div class="week-header">
+        <div class="week-num">${w.week}</div>
+        <div class="week-title">${w.title}</div>
+        <span class="week-chevron">▼</span>
+      </div>
+      <div class="week-body">
+        <p class="week-focus">${w.focus}</p>
+        <p style="font-size:12px; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-dim); margin-bottom:6px;">Topics</p>
+        <ul class="topic-list">
+          ${(w.topics||[]).map(t=>`<li>${t}</li>`).join('')}
+        </ul>
+        <div class="resources-label">Free Resources</div>
+        <div class="resource-chips">
+          ${(w.resources||[]).map(res=>`<a class="resource-chip" href="${res.url}" target="_blank" rel="noopener">↗ ${res.name}</a>`).join('')}
+        </div>
+        ${w.milestone ? `<div class="milestone-badge">🏁 ${w.milestone}</div>` : ''}
+        <label class="complete-toggle">
+          <input type="checkbox" onchange="toggleWeek(${w.week}, this.checked)" ${state.completedWeeks.has(w.week)?'checked':''} />
+          Mark week as complete
+        </label>
+      </div>`;
+    card.querySelector('.week-header').addEventListener('click', () => {
+      card.classList.toggle('open');
+    });
+    // Auto-open first week
+    if (i === 0) card.classList.add('open');
+    container.appendChild(card);
+  });
+
+  updateProgress(r.weeks.length);
+  showBlock('result-section');
+  document.getElementById('result-section').style.display = 'block';
+  document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleWeek(weekNum, done) {
+  if (done) state.completedWeeks.add(weekNum);
+  else state.completedWeeks.delete(weekNum);
+  updateProgress(state.roadmap.weeks.length);
+}
+
+function updateProgress(total) {
+  const done = state.completedWeeks.size;
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${done} of ${total} weeks completed`;
+}
+
+// ──────────────────────────────────────────
+// Chat Agent
+// ──────────────────────────────────────────
+function addMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = text.replace(/\n/g,'<br>');
+  document.getElementById('chat-msgs').appendChild(div);
+  document.getElementById('chat-msgs').scrollTop = 9999;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  document.getElementById('chat-send').disabled = true;
+
+  addMsg('user', q);
+
+  const systemPrompt = `You are EduGuide AI, a supportive and knowledgeable learning coach. The student has a personalised learning roadmap already built. Answer their questions about learning, motivation, resources, their roadmap, or study tips. Be warm, practical, and concise (2-4 sentences max unless detail is needed). The student's roadmap: "${state.roadmap?.title}".`;
+
+  state.chatHistory.push({ role: 'user', content: q });
+
+  try {
+    const reply = await callGroq(systemPrompt, state.chatHistory.slice(-10));
+    state.chatHistory.push({ role: 'assistant', content: reply });
+    addMsg('agent', reply);
+  } catch(e) {
+    addMsg('agent', 'Sorry, I had trouble responding. Please try again.');
+  }
+
+  document.getElementById('chat-send').disabled = false;
+  input.focus();
+}
+
+document.getElementById('chat-send').addEventListener('click', sendChat);
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+</script>
+</body>
+</html>
